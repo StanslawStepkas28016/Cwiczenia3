@@ -1,29 +1,48 @@
-﻿namespace Cwiczenia3;
+﻿using System.Text;
 
+namespace Cwiczenia3;
+
+// dorobić exception
 public abstract class Container
 {
-    private double GrossWeight { get; set; } // Waga kontener + towar.
-    private double NetWeight { get; set; } // Waga kontenera.
-    private double Height { get; set; }
-    private double Depth { get; set; }
-    private string serialNum { get; set; }
+    public double ContainerWeight { get; set; } // Waga kontenera.
+    public double Load { get; set; } // Waga towaru.
+    public double Height { get; set; } // Wysokość kontenera.
+    public double Depth { get; set; } // Głębokość kontenera.
+    public string SerialNum { get; set; } // Numer Seryjny
 
-    protected Container(double grossWeight, double netWeight, double height, double depth)
+    protected Container(double containerWeight, double load, double height, double depth, string serialNum)
     {
-        GrossWeight = grossWeight;
-        NetWeight = netWeight;
+        ContainerWeight = containerWeight;
+        Load = load;
         Height = height;
         Depth = depth;
+        SerialNum = serialNum;
     }
 
-    protected void emptyContainer()
+    public void EmptyContainer()
     {
-        GrossWeight -= NetWeight;
+        Load = 0;
     }
 
-    protected void loadContainer(double WeightToLoad)
+    public void LoadContainer(double WeightToLoad)
     {
-        GrossWeight = NetWeight + WeightToLoad;
+        Load += WeightToLoad;
+    }
+
+    public abstract void SetSerialNum();
+}
+
+public class LiquidContainer : Container
+{
+    public LiquidContainer(double containerWeight, double load, double height, double depth, string serialNum) : base(containerWeight, load, height, depth, serialNum)
+    {
+    }
+
+    public override void SetSerialNum()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append(SerialNum);
     }
 }
 
