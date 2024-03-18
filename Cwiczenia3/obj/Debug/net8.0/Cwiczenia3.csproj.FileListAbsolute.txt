@@ -12,3 +12,4 @@
 /Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/obj/Debug/net8.0/Cwiczenia3.pdb
 /Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/obj/Debug/net8.0/Cwiczenia3.genruntimeconfig.cache
 /Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/obj/Debug/net8.0/ref/Cwiczenia3.dll
+/Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/obj/Debug/net8.0/Cwiczenia3.sourcelink.json

@@ -1,22 +1,26 @@
 ﻿namespace Cwiczenia3;
 
-public abstract class Container
+abstract class ContainerObj
 {
-    public double GrossWeight { get; set; }
-    public double NetWeight { get; set; }
-    public double Height { get; set; }
-    public double Depth { get; set; }
+    private double GrossWeight { get; set; }
+    private double NetWeight { get; set; }
+    private double Height { get; set; }
+    private double Depth { get; set; }
+    private string serialNum { get; set; }
 
-    protected Container(double grossWeight, double height, double netWeight, double depth)
+    protected ContainerObj(double grossWeight, double netWeight, double height, double depth)
     {
         GrossWeight = grossWeight;
-        Height = height;
         NetWeight = netWeight;
+        Height = height;
         Depth = depth;
     }
+}
 
+public class Program
+{
     public static void Main(string[] args)
     {
-        Console.Out.Write("asdasd");
+        Console.Out.Write("Test");
     }
 }
