@@ -1,20 +1,25 @@
-﻿using System.Text;
+﻿using System.Linq.Expressions;
+using System.Text;
 
 namespace Cwiczenia3;
 
 // dorobić exception
 public abstract class Container
 {
-    public double ContainerWeight { get; set; } // Waga kontenera.
-    public double Load { get; set; } // Waga towaru.
-    public double Height { get; set; } // Wysokość kontenera.
-    public double Depth { get; set; } // Głębokość kontenera.
-    public string SerialNum { get; set; } // Numer Seryjny
+    public static HashSet<int> SerialSet { get; set; } = new HashSet<int>();
+    public double ContainerWeight { get; set; } // Waga kontenera (kg).
+    public double LoadWeight { get; set; } // Waga towaru (kg).
+    public double MaxLoad { get; set; } // Maksymalna ładowność (kg).
+    public double Height { get; set; } // Wysokość kontenera (cm).
+    public double Depth { get; set; } // Głębokość kontenera (cm).
+    public string SerialNum { get; set; } // Numer Seryjny.
 
-    protected Container(double containerWeight, double load, double height, double depth, string serialNum)
+    protected Container(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
+        string serialNum)
     {
         ContainerWeight = containerWeight;
-        Load = load;
+        LoadWeight = loadWeight;
+        MaxLoad = maxLoad;
         Height = height;
         Depth = depth;
         SerialNum = serialNum;
@@ -22,27 +27,51 @@ public abstract class Container
 
     public void EmptyContainer()
     {
-        Load = 0;
+        LoadWeight = 0;
     }
 
-    public void LoadContainer(double WeightToLoad)
+    public abstract void LoadContainer(double WeightToLoad);
+
+    protected void GenerateAndSetSerialNumber(string suffix)
     {
-        Load += WeightToLoad;
+        StringBuilder sb = new StringBuilder();
+        var next = new Random().Next();
+
+        while (!SerialSet.Contains(next))
+        {
+            next = new Random().Next();
+        }
+
+        sb.Append(SerialNum).Append(suffix).Append(next);
+        SerialSet.Add(next);
+        SerialNum = sb.ToString();
     }
 
-    public abstract void SetSerialNum();
+    public abstract void SetSerialNumAbstra();
 }
 
 public class LiquidContainer : Container
 {
-    public LiquidContainer(double containerWeight, double load, double height, double depth, string serialNum) : base(containerWeight, load, height, depth, serialNum)
+    public LiquidContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
+        string serialNum) : base(containerWeight, loadWeight, maxLoad, height, depth, serialNum)
     {
     }
 
-    public override void SetSerialNum()
+    public override void SetSerialNumAbstra()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.Append(SerialNum);
+        GenerateAndSetSerialNumber("-L-");
+    }
+
+    public override void LoadContainer(double WeightToLoad)
+    {
+        // dla niebezpiecznego ładunku
+        if (LoadWeight + WeightToLoad <= MaxLoad * 0.5)
+        {
+            
+        }
+        else
+        {
+        }
     }
 }
 
