@@ -1,12 +1,17 @@
-﻿using System.Linq.Expressions;
-using System.Text;
+﻿using System.Text;
 
 namespace Cwiczenia3;
 
-// dorobić exception
+public class OverfillException : Exception
+{
+    public OverfillException(string? message) : base(message)
+    {
+    }
+}
+
 public abstract class Container
 {
-    public static HashSet<int> SerialSet { get; set; } = new HashSet<int>();
+    public static HashSet<int> SerialSet { get; set; } = new HashSet<int>(); // .
     public double ContainerWeight { get; set; } // Waga kontenera (kg).
     public double LoadWeight { get; set; } // Waga towaru (kg).
     public double MaxLoad { get; set; } // Maksymalna ładowność (kg).
@@ -14,32 +19,32 @@ public abstract class Container
     public double Depth { get; set; } // Głębokość kontenera (cm).
     public string SerialNum { get; set; } // Numer Seryjny.
 
-    protected Container(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
-        string serialNum)
+    protected Container(double containerWeight, double loadWeight, double maxLoad, double height, double depth)
     {
+        if (loadWeight > maxLoad)
+        {
+            throw new OverfillException("Masa ładunku, nie może przekraczać maksymalnego ładunku kontenera!");
+        }
+
         ContainerWeight = containerWeight;
         LoadWeight = loadWeight;
         MaxLoad = maxLoad;
         Height = height;
         Depth = depth;
-        SerialNum = serialNum;
     }
 
-    public void EmptyContainer()
-    {
-        LoadWeight = 0;
-    }
 
     public abstract void LoadContainer(double WeightToLoad);
 
     protected void GenerateAndSetSerialNumber(string suffix)
     {
         StringBuilder sb = new StringBuilder();
-        var next = new Random().Next();
+        var random = new Random();
+        var next = random.Next();
 
-        while (!SerialSet.Contains(next))
+        while (SerialSet.Contains(next))
         {
-            next = new Random().Next();
+            next = random.Next();
         }
 
         sb.Append(SerialNum).Append(suffix).Append(next);
@@ -47,17 +52,16 @@ public abstract class Container
         SerialNum = sb.ToString();
     }
 
-    public abstract void SetSerialNumAbstra();
+    protected void EmptyContainer()
+    {
+        LoadWeight = 0;
+    }
 }
 
 public class LiquidContainer : Container
 {
-    public LiquidContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
-        string serialNum) : base(containerWeight, loadWeight, maxLoad, height, depth, serialNum)
-    {
-    }
-
-    public override void SetSerialNumAbstra()
+    public LiquidContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth) :
+        base(containerWeight, loadWeight, maxLoad, height, depth)
     {
         GenerateAndSetSerialNumber("-L-");
     }
@@ -79,6 +83,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Console.Out.Write("Test");
+        var liquidContainer = new LiquidContainer(200.0, 600, 500.0, 1500, 1500);
     }
 }
