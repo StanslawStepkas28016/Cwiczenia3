@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "/Users/stasiek/.nuget/packages/": {}
+    "/Users/stanislawstepka/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/Cwiczenia3.csproj",
+      "projectUniqueName": "/Users/stanislawstepka/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/Cwiczenia3.csproj",
       "projectName": "Cwiczenia3",
-      "projectPath": "/Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/Cwiczenia3.csproj",
-      "packagesPath": "/Users/stasiek/.nuget/packages/",
-      "outputPath": "/Users/stasiek/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/obj/",
+      "projectPath": "/Users/stanislawstepka/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/Cwiczenia3.csproj",
+      "packagesPath": "/Users/stanislawstepka/.nuget/packages/",
+      "outputPath": "/Users/stanislawstepka/Desktop/DYSK M/UCZELNIA/4 SEM/APBD/CW 3/Cwiczenia3/Cwiczenia3/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/stasiek/.nuget/NuGet/NuGet.Config"
+        "/Users/stanislawstepka/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -59,7 +59,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/Users/stasiek/.dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/Users/stanislawstepka/.dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
