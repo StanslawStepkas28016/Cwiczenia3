@@ -169,7 +169,7 @@ public class CoolingContainer : Container
 {
     public double Temperature;
     public string ProductType;
-    public static Dictionary<string, double> PossibleProducts = new Dictionary<string, double>(){ "eee"};
+    public static Dictionary<string, double> PossibleProducts = new Dictionary<string, double>(){{"a",2.4} ,};
 
     public CoolingContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
         double temperature, string productType) : base(containerWeight, loadWeight, maxLoad, height, depth)
