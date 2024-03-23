@@ -40,22 +40,19 @@ public abstract class Container
     {
         StringBuilder sb = new StringBuilder();
         var random = new Random();
-        var next = random.Next();
+        var next = random.Next(1, 1000);
 
         while (SerialSet.Contains(next))
         {
-            next = random.Next();
+            next = random.Next(1, 1000);
         }
 
-        sb.Append(SerialNum).Append(suffix).Append(next);
+        sb.Append("KON").Append(SerialNum).Append(suffix).Append(next);
         SerialSet.Add(next);
         SerialNum = sb.ToString();
     }
 
-    protected void EmptyContainer()
-    {
-        LoadWeight = 0;
-    }
+    public abstract void EmptyContainer();
 }
 
 public interface IHazardNotifier
@@ -80,6 +77,18 @@ public class LiquidContainer : Container, IHazardNotifier
     public void HazardNotification(string str)
     {
         Console.Out.WriteLine(str + " - Informacja dla konterea o numerze : " + this.SerialNum);
+    }
+
+    public override void EmptyContainer()
+    {
+        if (LoadWeight == 0)
+        {
+            HazardNotification("Kontener nie jest napełniony, nie można go opróżnić!");
+        }
+        else
+        {
+            LoadWeight = 0;
+        }
     }
 
     public override void LoadContainer(double weightToLoad)
@@ -114,11 +123,95 @@ public class LiquidContainer : Container, IHazardNotifier
     }
 }
 
+public class GasContainer : Container, IHazardNotifier
+{
+    public double Pressure;
+
+    public GasContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
+        double pressure) : base(containerWeight, loadWeight, maxLoad, height, depth)
+    {
+        Pressure = pressure;
+        GenerateAndSetSerialNumber("-G-");
+    }
+
+
+    public void HazardNotification(string str)
+    {
+        Console.Out.WriteLine(str + " - Informacja dla konterea o numerze : " + this.SerialNum);
+    }
+
+    public override void EmptyContainer()
+    {
+        if (LoadWeight == 0)
+        {
+            HazardNotification("Kontener nie jest napełniony, nie można go opróżnić!");
+        }
+        else
+        {
+            LoadWeight = 0.05 * LoadWeight;
+        }
+    }
+
+    public override void LoadContainer(double weightToLoad)
+    {
+        if (weightToLoad + LoadWeight > MaxLoad)
+        {
+            HazardNotification("Masa towaru nie może przekraczać maksymalnej masy ładunku kontenera!");
+        }
+        else
+        {
+            LoadWeight += weightToLoad;
+        }
+    }
+}
+
+public class CoolingContainer : Container
+{
+    public double Temperature;
+    public string ProductType;
+    public static Dictionary<string, double> PossibleProducts = new Dictionary<string, double>(){ "eee"};
+
+    public CoolingContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
+        double temperature, string productType) : base(containerWeight, loadWeight, maxLoad, height, depth)
+    {
+        Temperature = temperature;
+        ProductType = productType;
+        GenerateAndSetSerialNumber("-C-");
+    }
+
+    public override void LoadContainer(double weightToLoad)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void EmptyContainer()
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public class Program
 {
     public static void Main(string[] args)
     {
-        var liquidContainer = new LiquidContainer(200.0, 400, 500.0, 1500, 1500, false);
-        liquidContainer.LoadContainer(20);
+        // LiquidContainerTest();
+        GasContainerTest();
+    }
+
+    private static void GasContainerTest()
+    {
+        // var gasContainer = new GasContainer();
+    }
+
+    private static void LiquidContainerTest()
+    {
+        // Test ładowalności (gross Load mniejszy niż 90% i isHazard false) - musi przejść. 
+        var liquidContainerA = new LiquidContainer(200.0, 400, 500.0, 1500, 1500, false);
+        Console.Out.WriteLine(liquidContainerA.SerialNum);
+        liquidContainerA.LoadContainer(20);
+
+        // Test ładowalności (gross Load większy niż 50% i isHazard true) - nie może przejść. 
+        var liquidContainerB = new LiquidContainer(200.0, 400, 500.0, 1500, 1500, true);
+        liquidContainerB.LoadContainer(90);
     }
 }
