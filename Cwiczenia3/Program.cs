@@ -63,8 +63,7 @@ public interface IHazardNotifier
 
 public class LiquidContainer : Container, IHazardNotifier
 {
-    public bool IsHazard;
-
+    public bool IsHazard { get; set; }
 
     public LiquidContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
         bool isHazard) :
@@ -125,7 +124,7 @@ public class LiquidContainer : Container, IHazardNotifier
 
 public class GasContainer : Container, IHazardNotifier
 {
-    public double Pressure;
+    public double Pressure { get; set; }
 
     public GasContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
         double pressure) : base(containerWeight, loadWeight, maxLoad, height, depth)
@@ -165,28 +164,108 @@ public class GasContainer : Container, IHazardNotifier
     }
 }
 
-public class CoolingContainer : Container
+public class CoolingContainer : Container, IHazardNotifier
 {
-    public double Temperature;
-    public string ProductType;
-    public static Dictionary<string, double> PossibleProducts = new Dictionary<string, double>(){{"a",2.4} ,};
+    public double Temperature { get; set; }
+    public string ProductType { get; set; }
+
+    public static Dictionary<string, double> PossibleProducts = new Dictionary<string, double>()
+    {
+        { "Bananas", 13.3 },
+        { "Chocolate", 18 },
+        { "Fish", 2 },
+        { "Meat", -15 },
+        { "Ice cream", -18 },
+        { "Frozen pizza", -30 },
+        { "Cheese", 7.2 },
+        { "Sausages", 5 },
+        { "Butter", 20.5 },
+        { "Eggs", 19 }
+    };
 
     public CoolingContainer(double containerWeight, double loadWeight, double maxLoad, double height, double depth,
         double temperature, string productType) : base(containerWeight, loadWeight, maxLoad, height, depth)
     {
-        Temperature = temperature;
-        ProductType = productType;
         GenerateAndSetSerialNumber("-C-");
+
+        if (!PossibleProducts.ContainsKey(productType))
+        {
+            HazardNotification("Produkt " + productType + " nie istnieje w bazie dostępnych produktów.");
+
+            Console.Out.Write("Dostępne produkty to : ");
+            foreach (var key in PossibleProducts.Keys)
+            {
+                Console.Out.Write(key + ", ");
+            }
+
+            Console.Out.WriteLine();
+        }
+        else
+        {
+            if (temperature < PossibleProducts[productType])
+            {
+                HazardNotification("Temperatura produktu nie może być niższa niż temperatura sugerowania," +
+                                   " dokładnie : " + PossibleProducts[productType]);
+            }
+            else
+            {
+                Temperature = temperature;
+                ProductType = productType;
+            }
+        }
     }
 
     public override void LoadContainer(double weightToLoad)
     {
-        throw new NotImplementedException();
+        if (weightToLoad + LoadWeight > MaxLoad)
+        {
+            HazardNotification("Masa towaru nie może przekraczać maksymalnej masy ładunku kontenera!");
+        }
+        else
+        {
+            LoadWeight += weightToLoad;
+        }
     }
 
     public override void EmptyContainer()
     {
-        throw new NotImplementedException();
+        LoadWeight = 0;
+    }
+
+    public void HazardNotification(string str)
+    {
+        Console.Out.WriteLine(str + " - Informacja dla konterea o numerze : " + this.SerialNum);
+    }
+}
+
+public class ContainerShip
+{
+    private List<Container> OnShip { get; set; }
+    public double MaxSpeed { get; set; }
+    public int MaxContainers { get; set; }
+    public double MaxLoad { get; set; }
+
+    public ContainerShip(List<Container> containersOnShip, double maxSpeed, int maxContainers, double maxLoad)
+    {
+        OnShip = new List<Container>();
+        MaxSpeed = maxSpeed;
+        MaxContainers = maxContainers;
+        MaxLoad = maxLoad;
+    }
+
+    public void AddContainer(Container container)
+    {
+        OnShip.Add(container);
+    }
+
+    public void RemoveContainer(Container container)
+    {
+        OnShip.Remove(container);
+    }
+
+    public void EmptyShip()
+    {
+        OnShip.Clear();
     }
 }
 
@@ -195,12 +274,23 @@ public class Program
     public static void Main(string[] args)
     {
         // LiquidContainerTest();
-        GasContainerTest();
+        // GasContainerTest();
+        // CoolingContainerTest();
+    }
+
+    private static void CoolingContainerTest()
+    {
+        // Test dodania za niskiej temperatury.
+        var coolingContainerA = new CoolingContainer(200.0, 400,
+            500.0, 1500, 1500, 12.5, "Bananas");
+        // Test dodania produktu, który nie występuje w dictionary.
+        var coolingContainerB = new CoolingContainer(200.0, 400,
+            500.0, 1500, 1500, 12.5, "Mango");
     }
 
     private static void GasContainerTest()
     {
-        // var gasContainer = new GasContainer();
+        var gasContainer = new GasContainer(200.0, 400, 500.0, 1500, 1500, 1240);
     }
 
     private static void LiquidContainerTest()
