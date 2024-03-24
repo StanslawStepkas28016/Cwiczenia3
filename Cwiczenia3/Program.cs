@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Specialized;
+using System.Text;
 
 namespace Cwiczenia3;
 
@@ -267,9 +268,9 @@ public class ContainerShip : IHazardNotifier
     private int ContainersInShip;
     public static int ShipCounter = 1;
 
-    public ContainerShip(List<Container> containersOnShip, double maxSpeed, int maxContainers, double maxLoad)
+    public ContainerShip(double maxSpeed, int maxContainers, double maxLoad)
     {
-        OnBoard = new List<Container>(containersOnShip);
+        OnBoard = new List<Container>();
         MaxSpeed = maxSpeed;
         MaxContainers = maxContainers;
         MaxLoad = maxLoad;
@@ -278,23 +279,50 @@ public class ContainerShip : IHazardNotifier
 
     public void AddContainerList(List<Container> list)
     {
+        double loadSumTemp = 0;
+        var tempList = new List<Container>();
+
         foreach (var container in list)
         {
+            loadSumTemp += container.ContainerWeight + container.LoadWeight;
+
+            if (loadSumTemp > MaxLoad)
+            {
+                HazardNotification("Waga kontenerów razem z towarem przekracza ładowność statku," +
+                                   " zmniejsz ilość kontenerów," +
+                                   " bądź ich wagę!");
+                return;
+            }
+
             CurrentLoad += container.ContainerWeight + container.LoadWeight;
             ContainersInShip += 1;
+            tempList.Add(container);
+        }
+
+        foreach (var container in tempList)
+        {
             OnBoard.Add(container);
         }
     }
 
     public void ReplaceContainer(Container toReplaceContainer, Container replacementContainer)
     {
-        for (var i = 0; i < OnBoard.Count; i++)
+        if (OnBoard.Contains(toReplaceContainer))
         {
-            if (OnBoard[i].Equals(toReplaceContainer))
+            for (var i = 0; i < OnBoard.Count; i++)
             {
-                OnBoard[i] = replacementContainer;
-                break;
+                if (OnBoard[i].Equals(toReplaceContainer))
+                {
+                    OnBoard[i] = replacementContainer;
+                    break;
+                }
             }
+        }
+        else
+        {
+            HazardNotification("Statek nie zawiera kontenera : "
+                               + toReplaceContainer.SerialNum
+                               + ", nie można go zamienić!");
         }
     }
 
@@ -325,7 +353,10 @@ public class ContainerShip : IHazardNotifier
     {
         if (OnBoard.Any())
         {
-            OnBoard.Remove(container);
+            if (OnBoard.Contains(container))
+            {
+                OnBoard.Remove(container);
+            }
         }
         else
         {
@@ -340,20 +371,27 @@ public class ContainerShip : IHazardNotifier
 
     public void HazardNotification(string str)
     {
-        Console.Out.WriteLine(str + " - Informacja dla statku: " + ShipNumber);
+        Console.Out.WriteLine(str + " - Informacja dla statku nr : " + ShipNumber);
     }
 
     public void GetShipInfo()
     {
-        Console.Out.WriteLine("Statek o numerze : " + ShipNumber +
-                              " ma na pokładzie (" + CurrentLoad + "kg - " + ShipCounter + " statków : {");
-
-        foreach (var container in OnBoard)
+        if (OnBoard.Any())
         {
-            Console.Out.WriteLine(container.ToString());
-        }
+            Console.Out.WriteLine("Statek o numerze : " + ShipNumber +
+                                  " ma na pokładzie (" + CurrentLoad + "kg - " + ShipCounter + " statków : {");
 
-        Console.Out.WriteLine("}");
+            foreach (var container in OnBoard)
+            {
+                Console.Out.WriteLine(container.ToString());
+            }
+
+            Console.Out.WriteLine("}");
+        }
+        else
+        {
+            HazardNotification("Statek jest pusty, nie można wypisać informacji!");
+        }
     }
 }
 
@@ -369,17 +407,21 @@ public class Program
 
     private static void ShipTest()
     {
+        var gasContainer = new GasContainer(200.0, 600, 100_000,
+            1500, 1500, 1240);
+        
         List<Container> toPut = new List<Container>()
         {
-            new GasContainer(200.0, 400, 500.0,
-                1500, 1500, 1240),
+            gasContainer,
             new LiquidContainer(200.0, 400, 500.0,
                 1500, 1500, false),
             new CoolingContainer(200.0, 400,
                 500.0, 1500, 1500, 13.9, "Bananas")
         };
 
-        var containerShip = new ContainerShip(toPut, 100, 20, 100_000);
+        var containerShip = new ContainerShip(100, 20, 100_000);
+        containerShip.AddContainerList(toPut);
+        containerShip.RemoveContainer(gasContainer);
         containerShip.GetShipInfo();
     }
 
