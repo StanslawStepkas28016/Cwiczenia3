@@ -53,6 +53,8 @@ public abstract class Container
     }
 
     public abstract void EmptyContainer();
+
+    public abstract string ToString();
 }
 
 public interface IHazardNotifier
@@ -120,6 +122,11 @@ public class LiquidContainer : Container, IHazardNotifier
             HazardNotification("Masa towaru do załadowania przekracza masę możliwą do załadowania!");
         }
     }
+
+    public override string ToString()
+    {
+        return "Kontner o numerze : " + SerialNum + ", przechowuje ciecz w ilości : " + LoadWeight + "kg.";
+    }
 }
 
 public class GasContainer : Container, IHazardNotifier
@@ -161,6 +168,11 @@ public class GasContainer : Container, IHazardNotifier
         {
             LoadWeight += weightToLoad;
         }
+    }
+
+    public override string ToString()
+    {
+        return "Kontner o numerze : " + SerialNum + ", przechowuje gaz w ilości : " + LoadWeight + "kg.";
     }
 }
 
@@ -236,36 +248,112 @@ public class CoolingContainer : Container, IHazardNotifier
     {
         Console.Out.WriteLine(str + " - Informacja dla konterea o numerze : " + this.SerialNum);
     }
+
+    public override string ToString()
+    {
+        return "Kontner o numerze : " + SerialNum + ", przechowuje produkt chłodzony : "
+               + ProductType + ", w ilości : " + LoadWeight + "kg.";
+    }
 }
 
-public class ContainerShip
+public class ContainerShip : IHazardNotifier
 {
-    private List<Container> OnShip { get; set; }
+    private List<Container> OnBoard { get; set; }
     public double MaxSpeed { get; set; }
     public int MaxContainers { get; set; }
     public double MaxLoad { get; set; }
+    public int ShipNumber { get; set; }
+    private double CurrentLoad;
+    private int ContainersInShip;
+    public static int ShipCounter = 1;
 
     public ContainerShip(List<Container> containersOnShip, double maxSpeed, int maxContainers, double maxLoad)
     {
-        OnShip = new List<Container>();
+        OnBoard = new List<Container>(containersOnShip);
         MaxSpeed = maxSpeed;
         MaxContainers = maxContainers;
         MaxLoad = maxLoad;
+        ShipNumber = ShipCounter++;
+    }
+
+    public void AddContainerList(List<Container> list)
+    {
+        foreach (var container in list)
+        {
+            CurrentLoad += container.ContainerWeight + container.LoadWeight;
+            ContainersInShip += 1;
+            OnBoard.Add(container);
+        }
+    }
+
+    public void ReplaceContainer(Container toReplaceContainer, Container replacementContainer)
+    {
+        for (var i = 0; i < OnBoard.Count; i++)
+        {
+            if (OnBoard[i].Equals(toReplaceContainer))
+            {
+                OnBoard[i] = replacementContainer;
+                break;
+            }
+        }
     }
 
     public void AddContainer(Container container)
     {
-        OnShip.Add(container);
+        if (ShipCounter <= MaxLoad)
+        {
+            if (container.LoadWeight + container.ContainerWeight + MaxLoad > MaxLoad)
+            {
+                CurrentLoad += container.ContainerWeight + container.LoadWeight;
+                OnBoard.Add(container);
+            }
+            else
+            {
+                HazardNotification("Nie można załadować kontenera na statek," +
+                                   " jego waga przekracza dopuszczalną na ten moment wagę," +
+                                   " która wynosi : " + (MaxLoad - CurrentLoad) + "!");
+            }
+        }
+        else
+        {
+            HazardNotification("Przekroczono ładowność statku, " +
+                               "maksymalna ilość kontenerów na statku to : " + MaxContainers);
+        }
     }
 
     public void RemoveContainer(Container container)
     {
-        OnShip.Remove(container);
+        if (OnBoard.Any())
+        {
+            OnBoard.Remove(container);
+        }
+        else
+        {
+            HazardNotification("Na statku nie ma żadnych kontenerów, nie można usunąć kontenera!");
+        }
     }
 
     public void EmptyShip()
     {
-        OnShip.Clear();
+        OnBoard.Clear();
+    }
+
+    public void HazardNotification(string str)
+    {
+        Console.Out.WriteLine(str + " - Informacja dla statku: " + ShipNumber);
+    }
+
+    public void GetShipInfo()
+    {
+        Console.Out.WriteLine("Statek o numerze : " + ShipNumber +
+                              " ma na pokładzie (" + CurrentLoad + "kg - " + ShipCounter + " statków : {");
+
+        foreach (var container in OnBoard)
+        {
+            Console.Out.WriteLine(container.ToString());
+        }
+
+        Console.Out.WriteLine("}");
     }
 }
 
@@ -276,6 +364,23 @@ public class Program
         // LiquidContainerTest();
         // GasContainerTest();
         // CoolingContainerTest();
+        ShipTest();
+    }
+
+    private static void ShipTest()
+    {
+        List<Container> toPut = new List<Container>()
+        {
+            new GasContainer(200.0, 400, 500.0,
+                1500, 1500, 1240),
+            new LiquidContainer(200.0, 400, 500.0,
+                1500, 1500, false),
+            new CoolingContainer(200.0, 400,
+                500.0, 1500, 1500, 13.9, "Bananas")
+        };
+
+        var containerShip = new ContainerShip(toPut, 100, 20, 100_000);
+        containerShip.GetShipInfo();
     }
 
     private static void CoolingContainerTest()
@@ -291,6 +396,7 @@ public class Program
     private static void GasContainerTest()
     {
         var gasContainer = new GasContainer(200.0, 400, 500.0, 1500, 1500, 1240);
+        Console.Out.WriteLine(gasContainer.ToString());
     }
 
     private static void LiquidContainerTest()
