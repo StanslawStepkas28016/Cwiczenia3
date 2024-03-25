@@ -1,9 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Text;
-
-namespace Cwiczenia3;
-
-
+﻿namespace Cwiczenia3;
 
 public class Program
 {
