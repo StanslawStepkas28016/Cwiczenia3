@@ -3,18 +3,7 @@ using System.Text;
 
 namespace Cwiczenia3;
 
-public class OverfillException : Exception
-{
-    public OverfillException(string? message) : base(message)
-    {
-    }
-}
 
-public interface IHazardNotifier
-{
-    // Do prób wykonania niebezpiecznej operacji.
-    public void HazardNotification(string str);
-}
 
 public class Program
 {
